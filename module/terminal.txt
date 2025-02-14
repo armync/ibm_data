@@ -1,0 +1,9 @@
+theia@theiadocker:/home/project$ p
+ython3
+Python 3.10.12 (main, Nov  6 2024, 20:22:13) [GCC 11.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import mymath
+>>> mymath.basic.add(3,4)
+7
+>>> mymath.stats.mean([3,4,5])
+4.0
