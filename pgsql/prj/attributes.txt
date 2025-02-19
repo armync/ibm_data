@@ -1,0 +1,11 @@
+sales_transaction (
+    transaction_id,
+    transaction_date,
+    transcation_time,
+    sales_outlet_id,
+    staff_id,
+    customer_id,
+    product_id,
+    quantity,
+    price
+)
