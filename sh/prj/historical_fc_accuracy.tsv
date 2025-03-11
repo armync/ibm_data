@@ -1,0 +1,7 @@
+year	month	day	obs_temp	fc_temp	accuracy	accuracy_range
+2025	03	04	16	°C		poor
+2025	03	04	16		-16	poor
+2025	03	04	16		-16	poor
+2025	03	04	16	°C		poor
+2025	03	04	16		-16	poor
+2025	03	04	16	18	2	good
