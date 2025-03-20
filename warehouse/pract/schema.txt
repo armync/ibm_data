@@ -1,0 +1,28 @@
+-- MyDimDate
+
+dateid
+year
+month
+monthname
+day
+weekday
+weekdayname
+
+-- MyDimProduct
+
+productid
+productname
+
+-- MyDimCustoemrSegment
+
+segmentid
+segmentname
+
+-- MyFactSales
+
+salesid
+productid
+quantitysold
+priceperunit
+segmentid
+dateid
