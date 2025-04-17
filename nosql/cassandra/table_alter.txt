@@ -1,0 +1,21 @@
+CREATE KEYSPACE training  
+WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+
+CREATE TABLE books(
+    book_id INT PRIMARY KEY,
+    author TEXT,
+    title TEXT
+);
+
+ALTER TABLE books
+add date_of_publication date;
+
+ALTER TABLE books
+add price decimal;
+
+ALTER TABLE books
+drop price;
+
+DROP TABLE books;
+
+DROP KEYSPACE training;

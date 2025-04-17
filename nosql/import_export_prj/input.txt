@@ -1,0 +1,82 @@
+mongosh -u root -p KGn3HGqYspavpdc9QS7Kex8O --authenticationDatabase admin local --host mongo
+
+use training
+
+db.createCollection("bigdata")
+
+cqlsh 172.21.214.252 9042 --username root --password GlrPhAaCKPdOPCwZOaFOMmX0
+
+mongoimport -u root -p KGn3HGqYspavpdc9QS7Kex8O --authenticationDatabase admin -d entertainment -c movies --host mongo movies.json
+
+db.movies.aggregate([
+    {
+        "$group": {
+            "_id": "$year",
+            "moviecount": { "$sum": 1}
+        }
+    },
+    {
+        "$sort": { "moviecount": -1 } 
+    },
+    {
+        "$limit": 1
+    }
+])
+
+db.movies.countDocuments({"year": { $gt: 1999} })
+
+: <<'COMMENT'
+{
+  _id: '9',
+  title: 'The Lost City of Z',
+  genre: 'Action,Adventure,Biography',
+  Description: 'A true-life drama, centering on British explorer Col. Percival Fawcett, who disappeared while searching for a mysterious city in the Amazon in the 1920s.',
+  Director: 'James Gray',
+  Actors: 'Charlie Hunnam, Robert Pattinson, Sienna Miller, Tom Holland',
+  year: 2016,
+  'Runtime (Minutes)': 141,
+  rating: 'unrated',
+  Votes: 7188,
+  'Revenue (Millions)': 8.01,
+  Metascore: 78
+}
+COMMENT
+
+db.movies.aggregate([
+    {
+        $match: {year: 2007}
+    },
+    {
+        $group: {
+            '_id': 'votes',
+            'averageVotes': {$avg: '$Votes'}
+        }
+    }
+])
+
+mongoexport -u root -p KGn3HGqYspavpdc9QS7Kex8O --authenticationDatabase admin -d entertainment -c movies -f "_id,title,year,rating,director" --type=csv -o partial_data.csv --host mongo
+
+CREATE keyspace entertainment
+WITH replication = {'class':'SimpleStrategy','replication_factor':3};
+
+use entertainment;
+CREATE TABLE movies (
+    id text PRIMARY KEY,
+    title text,
+    year text,
+    rating text,
+    director text
+);
+
+describe movies;
+
+COPY entertainment.movies(id,title,year,rating,director) FROM '/home/project/partial_data.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+SELECT COUNT(*) FROM movies;
+
+CREATE INDEX IF NOT EXISTS rating_index
+ON entertainment.movies (rating);
+
+describe movies;
+
+SELECT COUNT(*) FROM movies WHERE rating = 'G';
