@@ -1,0 +1,377 @@
+[ Create a data architecture, clearly defining each step of the process, for an online retail company.
+Please take note of the following specifications.
+
+- The company does not want to use cloud platforms for storage or processing.
+
+-  They want an SQL-based central data repository that can be accessed by any employee as per requirements. ]
+
+
+
+    Define data sources: Identify all the sources of data within the company, such as sales transactions, customer information, inventory data, and so on.
+
+    Data collection: Set up processes to collect data from the various sources and store it in the on-premises SQL server. This can involve setting up data pipelines to automate the extraction and loading of data into the central repository.
+
+    Data transformation: Clean and transform the data to ensure consistency and quality. This may involve data cleansing, normalization, and standardization to make the data usable for analysis.
+
+    Data modeling: Design the database schema and data model to organize the data in a structured and efficient manner. Define relationships between different data entities to facilitate data retrieval and analysis.
+
+    Data access: Implement access controls and permissions to regulate who can access and modify the data in the central repository. This ensures data security and compliance with privacy regulations.
+
+    Data analysis: Provide tools and interfaces for employees to access and analyze the data stored in the central repository. This can include dashboards, reporting tools, and data visualization techniques to make data insights easily accessible.
+
+    Data backup and recovery: Establish regular data backup procedures to prevent data loss in case of system failures or disasters. Implement disaster recovery plans to ensure quick recovery of data in case of emergencies.
+
+    Data governance: Implement policies and procedures to govern the use and management of data within the company. This includes data quality standards, data retention policies, and data lifecycle management practices.
+
+By following these steps, you can create a comprehensive data architecture for the online retail company that meets their specifications of not using cloud platforms and having an SQL-based central data repository accessible to all employees. 
+
+[ Propose a data schema for an online retail store that meets the following guidelines.
+
+- Records Customer information, inventory information, and transaction invoice information.
+- Prepare the final data such that the final record of sales invoices has the headers `InvoiceNo`, `StockCode`, `Description`, `Quantity`, `InvoiceDate`, `UnitPrice`, `CustomerID` and `Country`. ]
+
+To create a data schema for an online retail store that includes customer information, seller information, inventory information, and transaction invoice information, you can design a relational database with the following tables:
+
+    Customer table:
+
+    CustomerID (Primary key)
+    CustomerName
+    Address
+    Phone
+    Email
+
+    Inventory table:
+
+    StockCode (Primary key)
+    Description
+    QuantityAvailable
+    Price
+
+    Transaction Invoice table:
+
+    InvoiceNo (Primary key)
+    StockCode (Foreign key referencing Inventory table)
+    Quantity
+    InvoiceDate
+    UnitPrice
+    CustomerID (Foreign key referencing Customer table)
+    Country
+
+By setting up this data schema, you can store and manage customer information, inventory details, and transaction invoice data in a structured and organized manner. The final record of sales invoices can be retrieved by querying the Transaction Invoice table with the specified headers: InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, and Country.
+
+[ Generate the SQL code to create this data warehouse ]
+
+-- Create Customer Table
+CREATE TABLE Customer (
+    CustomerID INT PRIMARY KEY,
+    CustomerName VARCHAR(50),
+    Address VARCHAR(100),
+    Phone VARCHAR(20),
+    Email VARCHAR(50)
+);
+
+-- Create Inventory Table
+CREATE TABLE Inventory (
+    StockCode INT PRIMARY KEY,
+    Description VARCHAR(100),
+    QuantityAvailable INT,
+    Price DECIMAL(10, 2)
+);
+
+-- Create Transaction Invoice Table
+CREATE TABLE TransactionInvoice (
+    InvoiceNo INT PRIMARY KEY,
+    StockCode INT,
+    Quantity INT,
+    InvoiceDate DATE,
+    UnitPrice DECIMAL(10, 2),
+    CustomerID INT,
+    Country VARCHAR(50),
+    FOREIGN KEY (StockCode) REFERENCES Inventory(StockCode),
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+[ Propose a set of infrastructure requirements for different stages of the data workflow based on the data architecture discussed her. ]
+
+Based on the data architecture discussed for the online retail company, the infrastructure requirements for different stages of the data workflow can be outlined as follows:
+
+    Data collection:
+        Hardware: Servers or devices to collect data from various sources and transfer the data to the central SQL server.
+        Software: Data collection tools and scripts to automate the extraction and load the data into the central repository.
+        Networking: Reliable network connections to ensure the seamless data transfer between sources and the central repository.
+
+    Data transformation:
+        Hardware: Sufficient processing power and memory to handle data transformation tasks efficiently.
+        Software: Data transformation tools and ETL (Extract, Transform, Load) processes to clean, normalize, and standardize the data.
+        Networking: Fast and stable network connections to support data transformation processes.
+
+    Data modeling:
+        Hardware: Hardware resources to support database schema design and data modeling activities.
+        Software: Database management software to define relationships between data entities and optimize data storage.
+        Networking: Network connectivity to access and manage the database schema.
+
+    Data access:
+        Hardware: Devices and systems to access the central data repository for analysis and reporting.
+        Software: Data visualization tools, reporting software, and query interfaces for employees to access and analyze data.
+        Networking: Secure network connections to ensure data access controls and permissions are enforced.
+
+    Data backup and recovery:
+        Hardware: Backup storage devices or systems to store copies of data for disaster recovery purposes.
+        Software: Backup and recovery software to automate data backup processes and ensure data integrity.
+        Networking: Network connections to facilitate data backup and recovery operations.
+
+    Data security:
+        Hardware: Security appliances or devices to protect the data warehouse from unauthorized access.
+        Software: Encryption software, access control mechanisms, and data security tools to secure sensitive data.
+        Networking: Secure network configurations, firewalls, and monitoring tools to detect and prevent security breaches.
+
+[ For the transactional data table, create a python code that does the following.
+
+1. Read the CSV data from a URL using Pandas
+
+2. Remove entries where 
+   a. InvoiceNo starts with the character 'C'
+   b. StockCode is either 'M', 'D', 'C2' or 'POST'
+   c. CustomerID is missing.
+   Print the length of the dataset before and after removal.
+
+3. Load the final data to an SQLIte3 database named 'Invoice_Records' as a table 'Purchase_transactions'.
+
+4. Run a sample query to display the first 5 rows of the table. ]
+
+
+###  sample response
+
+import pandas as pd
+import sqlite3
+
+# Read the CSV data from a URL
+url = "insert_your_csv_url_here"
+data = pd.read_csv(url)
+
+# Print the length of the dataset before removal
+print("Length of dataset before removal:", len(data))
+
+# Remove entries that meet the specified conditions
+initial_length = len(data)
+data = data[~data['InvoiceNo'].str.startswith('C')]
+data = data[~data['StockCode'].isin(['M', 'D', 'C2', 'POST'])]
+data = data.dropna(subset=['CustomerID'])
+
+# Print the length of the dataset after removal
+print("Length of dataset after removal:", len(data))
+print("Number of entries removed:", initial_length - len(data))
+
+# Load the final data to an SQLite3 database
+conn = sqlite3.connect('Invoice_Records.db')
+data.to_sql('Purchase_transactions', conn, if_exists='replace', index=False)
+
+# Run a sample query to display the first 5 rows of the table
+query_result = pd.read_sql_query("SELECT * FROM Purchase_transactions LIMIT 5;", conn)
+print(query_result)
+
+conn.close()
+
+### testing code
+
+import pandas as pd
+import sqlite3
+
+# Read the CSV data from a URL
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMSkillsNetwork-AI0273EN-SkillsNetwork/labs/v1/m3/data/Project_data.csv"
+data = pd.read_csv(url)
+
+# Print the length of the dataset before removal
+print("Length of dataset before removal:", len(data))
+
+# Remove entries that meet the specified conditions
+initial_length = len(data)
+data = data[~data['InvoiceNo'].str.startswith('C')]
+data = data[~data['StockCode'].isin(['M', 'D', 'C2', 'POST'])]
+data = data.dropna(subset=['CustomerID'])
+
+# Print the length of the dataset after removal
+print("Length of dataset after removal:", len(data))
+print("Number of entries removed:", initial_length - len(data))
+
+# Load the final data to an SQLite3 database
+conn = sqlite3.connect('Invoice_Records.db')
+data.to_sql('Purchase_transactions', conn, if_exists='replace', index=False)
+
+# Run a sample query to display the first 5 rows of the table
+query_result = pd.read_sql_query("SELECT * FROM Purchase_transactions LIMIT 5;", conn)
+print(query_result)
+
+conn.close()
+
+[ Create a python code that will extract all records from the table 'Purchase_transactions' under the database 'Invoice_records', such that the Country parameter is set to Germany. The resulting record should be saved in a dataframe. ]
+
+To extract all records from the 'Purchase_transactions' table under the 'Invoice_records' database where the Country parameter is set to Germany and save the resulting records in a dataframe in Python, you can use the following code snippet: 
+
+import sqlite3
+import pandas as pd
+
+# Connect to the database
+conn = sqlite3.connect('Invoice_records.db')
+
+# Execute a query to select all records from the 'Purchase_transactions' table with Country set to Germany
+query = "SELECT * FROM Purchase_transactions WHERE Country = 'Germany'"
+df = pd.read_sql(query, conn)
+
+# Print the dataframe
+print(df)
+
+# Close the connection
+conn.close()
+
+This code snippet specifically filters the records where the Country is set to Germany and saves the results in a pandas dataframe df. Ensure you have the pandas library installed in your Python environment to run this code successfully.
+
+### code for testing
+
+import pandas as pd
+import sqlite3
+
+# Read the CSV data from a URL
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMSkillsNetwork-AI0273EN-SkillsNetwork/labs/v1/m3/data/Project_data.csv"
+data = pd.read_csv(url)
+
+# Print the length of the dataset before removal
+print("Length of dataset before removal:", len(data))
+
+# Remove entries that meet the specified conditions
+initial_length = len(data)
+data = data[~data['InvoiceNo'].str.startswith('C')]
+data = data[~data['StockCode'].isin(['M', 'D', 'C2', 'POST'])]
+data = data.dropna(subset=['CustomerID'])
+
+# Print the length of the dataset after removal
+print("Length of dataset after removal:", len(data))
+print("Number of entries removed:", initial_length - len(data))
+
+# Load the final data to an SQLite3 database
+conn = sqlite3.connect('Invoice_Records.db')
+data.to_sql('Purchase_transactions', conn, if_exists='replace', index=False)
+
+# Run a sample query to display the first 5 rows of the table
+query_result = pd.read_sql_query("SELECT * FROM Purchase_transactions LIMIT 5;", conn)
+print(query_result)
+
+query = "SELECT * FROM Purchase_transactions WHERE Country IN ('Germany')"
+records = pd.read_sql(query, conn)
+
+# Print the extracted records
+print(records)
+
+conn.close()
+
+[ For the data frame extracted here, write a python code to execute the apriori algorithm and extract association rules for the given set of invoices. For this outcome, perform the following steps:
+
+1. Group the records by InvoiceID and Description, along with their total quantities
+
+2. Unpack the data into a table, making the InvoiceNo, the row indexes, Unique descriptions as column indexes and the total quantities, the values.
+
+3. Apply one-hot encoding on this table, making the value True if the Item description existed in the invoice and False if it didn't exist in the invoice.
+
+4. Perfrom Apriori algorithm on this data and extract the required association rules. ]
+
+To execute the Apriori algorithm and extract association rules for the set of invoices extracted from the 'Purchase_transactions' table under the 'Invoice_records' database, you can follow these steps:
+
+    Group the records by InvoiceID and Description, along with their total quantities:
+
+    import sqlite3
+import pandas as pd
+
+# Connect to the database
+conn = sqlite3.connect('Invoice_records.db')
+
+# Execute a query to select all records from the 'Purchase_transactions' table
+query = "SELECT InvoiceID, Description, SUM(Quantity) AS TotalQuantity FROM Purchase_transactions GROUP BY InvoiceID, Description"
+df_grouped = pd.read_sql_query(query, conn)
+
+# Close the connection
+conn.close()
+
+
+    Unpack the data into a table with the InvoiceNo” items as row indexes, Unique descriptions as column indexes, and total quantities as values:
+
+df_pivot = df_grouped.pivot(index='InvoiceNo', columns='Description', values='TotalQuantity').fillna(0)
+
+    
+    Apply one-hot encoding on this table:
+
+df_encoded = df_pivot.applymap(lambda x: 1 if x > 0 else 0)
+
+
+    Perform the Apriori algorithm using this data and extract the association rules:
+
+from mlxtend.frequent_patterns import apriori
+from mlxtend.frequent_patterns import association_rules
+
+# Apply the Apriori algorithm to find frequent itemsets
+frequent_itemsets = apriori(df_encoded, min_support=0.1, use_colnames=True)
+
+# Generate association rules from the frequent itemsets
+rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
+
+# Print the association rules
+print(rules)
+
+### final code
+
+import pandas as pd
+import sqlite3
+from mlxtend.frequent_patterns import apriori
+from mlxtend.frequent_patterns import association_rules
+
+# Read the CSV data from a URL
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMSkillsNetwork-AI0273EN-SkillsNetwork/labs/v1/m3/data/Project_data.csv"
+data = pd.read_csv(url)
+
+# Print the length of the dataset before removal
+#print("Length of data set before removal:", len(data))
+
+# Remove entries that meet the specified conditions
+initial_length = len(data)
+data = data[~data['InvoiceNo'].str.startswith('C')]
+data = data[~data['StockCode'].isin(['M', 'D', 'C2', 'POST'])]
+data = data.dropna(subset=['CustomerID'])
+
+# Print the length of the data set after removal
+#print("Length of data set after removal:", len(data))
+#print("Number of entries removed:", initial_length - len(data))
+
+# Load the final data to an SQLite3 database
+conn = sqlite3.connect('Invoice_Records.db')
+data.to_sql('Purchase_transactions', conn, if_exists='replace', index=False)
+
+# Run a sample query to display the first 5 rows of the table
+query_result = pd.read_sql_query("SELECT * FROM Purchase_transactions LIMIT 5;", conn)
+#print(query_result)
+
+query = "SELECT * FROM Purchase_transactions WHERE Country IN ('Germany')"
+records = pd.read_sql(query, conn)
+
+# Print the extracted records
+#print(records)
+
+# Execute a query to select all records from the 'Purchase_transactions' table
+query = "SELECT InvoiceNo, Description, SUM(Quantity) AS TotalQuantity FROM Purchase_transactions GROUP BY InvoiceNo, Description"
+df_grouped = pd.read_sql(query, conn)
+
+df_pivot = df_grouped.pivot(index='InvoiceNo', columns='Description', values='TotalQuantity').fillna(0)
+
+df_encoded = df_pivot.applymap(lambda x: 1 if x > 0 else 0)
+
+# Apply the Apriori algorithm to find frequent itemsets
+frequent_itemsets = apriori(df_encoded, min_support=0.05, use_colnames=True)
+
+# Generate association rules from the frequent itemsets
+rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
+
+# Sort the association rules in descending order of confidence
+rules = rules.sort_values(by='confidence', ascending=False)
+
+# Print the association rules
+print(rules[['antecedents','consequents','confidence']])
+
+conn.close()

@@ -1,0 +1,89 @@
+[ Create a detailed data warehouse schema for a fashion retail store that should contain employee data, sales data, inventory data, customer profiles, and seller information, listing the headers for each of the tables clearly mentioning the primary and foriegn keys for each. 
+The sales data should connect to employee data, customer profile, and inventory tables. 
+The inventory table should further be connected to the employee table and the seller table. ]
+
+
+To create a detailed data warehouse schema for a fashion retail store, you can design the following tables with their respective headers, primary keys, and foreign keys:
+
+    Employee Data:
+        employee_id (Primary Key)
+        employee_name
+        position
+        department
+
+    Sales Data:
+        sale_id (Primary Key)
+        employee_id (Foreign Key referencing Employee Data)
+        customer_id (Foreign Key referencing Customer Profiles)
+        product_id (Foreign Key referencing Inventory Data)
+        sale_date
+        sale_amount
+
+    Inventory Data:
+        product_id (Primary Key)
+        product_name
+        price
+        quantity
+        employee_id (Foreign Key referencing Employee Data)
+        seller_id (Foreign Key referencing Seller Information)
+
+    Customer Profiles:
+        customer_id (Primary Key)
+        customer_name
+        email
+        address
+        phone_number
+
+    Seller Information:
+        seller_id (Primary Key)
+        seller_name
+        seller_type
+
+
+[ Provide an SQL code to create the data warehouse discussed above. ]
+
+Certainly! Here is an SQL code to create the data warehouse schema for a fashion retail store:
+
+CREATE TABLE Employee (
+    employee_id INT PRIMARY KEY,
+    employee_name VARCHAR(50),
+    employee_role VARCHAR(50),
+    employee_department VARCHAR(50)
+);
+
+CREATE TABLE SalesData (
+    sale_id INT PRIMARY KEY,
+    sale_date DATE,
+    sale_amount DECIMAL(10, 2),
+    employee_id INT,
+    customer_id INT,
+    inventory_id INT,
+    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id),
+    FOREIGN KEY (customer_id) REFERENCES CustomerProfiles(customer_id),
+    FOREIGN KEY (inventory_id) REFERENCES Inventory(inventory_id)
+);
+
+CREATE TABLE Inventory (
+    inventory_id INT PRIMARY KEY,
+    product_name VARCHAR(50),
+    product_category VARCHAR(50),
+    quantity_available INT,
+    seller_id INT,
+    FOREIGN KEY (seller_id) REFERENCES SellerInformation(seller_id)
+);
+
+CREATE TABLE CustomerProfiles (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    customer_email VARCHAR(50),
+    customer_phone VARCHAR(20)
+);
+
+CREATE TABLE SellerInformation (
+    seller_id INT PRIMARY KEY,
+    seller_name VARCHAR(50),
+    seller_contact VARCHAR(50),
+    seller_location VARCHAR(50)
+);
+
+This SQL code will create the necessary tables with the specified columns and foreign key relationships as discussed in the data warehouse schema for a fashion retail store.
